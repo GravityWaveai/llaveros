@@ -11,8 +11,14 @@ def fit_circle(pts):
     c, *_ = np.linalg.lstsq(A, b, rcond=None); cx, cy = c[0], c[1]; r = math.sqrt(c[2] + cx**2 + cy**2)
     return cx, cy, r
 
-def medir():
+def medir(cnc=True):
     g, hc, hd, info = vectorizar()
+    if cnc:   # geometría apta para fresa Ø9: cierre morfológico R4,5 (solo cambia las dos uniones de radio pequeño)
+        from shapely.geometry.polygon import orient
+        g0 = g
+        g = orient(g.buffer(R_MIN + 0.12, 96).buffer(-(R_MIN + 0.12), 96).simplify(0.01), sign=1.0)   # R4,62: tras discretizar queda >= R4,5
+        info["desv_cnc_mm"] = round(max(max(g.exterior.distance(Point(p)) for p in g0.exterior.coords), max(g0.exterior.distance(Point(p)) for p in g.exterior.coords)), 2)
+        info["area_cnc_mm2"] = round(g.area - g0.area, 2)
     minx, miny, maxx, maxy = g.bounds
     pts = list(g.exterior.coords)
     # tubo: puntos del contorno dentro de la zona del hueco (ajuste por círculo)
@@ -46,7 +52,7 @@ def medir():
     return dict(g=g, hole=(round(hc[0], 2), round(hc[1], 2)), hole_d=round(hd, 2), ancho=round(maxx - minx, 2), alto=round(maxy - miny, 2),
                 tubo=(round(tcx, 2), round(tcy, 2), round(2 * tr, 2)), lobulo=(round(ncx, 2), round(ncy, 2), round(nr, 2)),
                 boca=round(boca, 2), cresta=(round(top[0], 2), round(top[1], 2)), base=(round(base[0], 2), round(base[1], 2)),
-                labio=(round(tip[0], 2), round(tip[1], 2)), pared=round(pared, 2), area=round(g.area / 100, 2),
+                labio=(round(tip[0], 2), round(tip[1], 2)), pared=round(pared, 2), area=round(g.area / 100, 2), info=info,
                 cnc_inaccesible=[(round(m.area, 1), round(m.centroid.x, 1), round(m.centroid.y, 1)) for m in miss],
                 finas=[(round(t.area, 1), round(t.centroid.x, 1), round(t.centroid.y, 1)) for t in thin])
 

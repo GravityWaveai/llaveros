@@ -1,0 +1,43 @@
+OK     DXF: auditoría ezdxf sin errores  -> errores=0 arreglos=0
+OK     DXF: unidades mm ($INSUNITS=4)
+OK     DXF: solo 2 entidades (contorno + taladro)  -> [('LWPOLYLINE', 'CUT_OUTER'), ('CIRCLE', 'DRILL')]
+OK     DXF: contorno en capa CUT_OUTER y cerrado
+OK     DXF: taladro en capa DRILL
+OK     Contorno: polígono válido, sin autointersecciones  -> Valid Geometry
+OK     Contorno: sin puntos duplicados  -> 200 puntos
+OK     Contorno: segmentos cortos en las curvas (error de cuerda < 0,05 mm)  -> máx 2.84 mm en curvas; tramo recto de la base 32.6 mm
+OK     Contorno: orientación antihoraria (CCW)
+OK     Dimensiones: alto = 40,00 mm  -> 40.000
+OK     Dimensiones: ancho 46,23 mm  -> 46.231
+OK     Origen: envolvente empieza en (0,0)  -> (0.002,0.000)
+OK     Taladro: Ø4,8 en (40.65, 16.3)  -> Ø4.8 en (40.65, 16.3)
+OK     Taladro: dentro de la pieza, pared >= 2,5 mm  -> pared 2.71 mm
+OK     CNC Ø9: zonas no alcanzables por la fresa (> 0,3 mm²)
+OK     CNC: sin zonas de material < 5 mm
+OK     CNC: una sola pieza, sin islas ni huecos cerrados
+OK     CNC Ø9: radio cóncavo mínimo del contorno (arcos R4,62; tolerancia de discretización 1 %)  -> mín R4.49 (se exige R4,5): zonas de unión labio-tubo y lóbulo-tubo
+OK     Tubo: Ø12.33 > Ø9, la fresa entra y vacía el hueco
+OK     Boca del tubo tal como la deja la fresa Ø9 = 6.35 mm (dibujo original: 7,81)  -> 6.34 mm
+OK     3D: el contorno extruye a un sólido válido de 5 mm  -> volumen 6188 mm³
+OK     3D: volumen = área DXF x 5 - taladro  -> 6187.9 vs 6187.9
+OK     PDF: formato A3 apaisado
+OK     PDF contiene '46.23'
+OK     PDF contiene '40'
+OK     PDF contiene '40.65'
+OK     PDF contiene '16.3'
+OK     PDF contiene 'Ø4.8'
+OK     PDF contiene 'Ø12.33'
+OK     PDF contiene '31.41'
+OK     PDF contiene '24.04'
+OK     PDF contiene '6.35'
+OK     PDF contiene '32.89'
+OK     PDF contiene 'ESCALA'
+OK     PDF contiene '2.5:1'
+OK     PDF contiene 'FRESA'
+OK     PDF contiene 'NO APTO PARA USO ALIMENTARIO'
+OK     PDF contiene 'CUT_OUTER'
+OK     PDF contiene 'DRILL'
+FALLO  PDF: datos PENDIENTES (no enviar a taller hasta completarlos)  -> cantidad, canto, esquina, aristas
+OK     Fidelidad: contorno DXF = dibujo de referencia salvo las dos uniones R4,5 (desv. máx < 1 mm, solo en la boca)  -> 0.875 mm
+OK     Fidelidad: la desviación queda confinada a la boca del tubo  -> 12 vértices desviados, en x 36.2-40.1, y 20.8-28.7
+TOTAL FALLOS: 1 de 42

@@ -8,7 +8,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from shapely.geometry import Point
 from medidas import medir
 
-REF = "Llavero_Ola_REV02"; PRODUCTO = "Llavero ola"
+REF = "Llavero_Ola_REV03"; PRODUCTO = "Llavero ola"
 ACABADO = "Formentera"; ESPESOR = 5; CANTIDAD = "PENDIENTE"
 CANTO = "PENDIENTE"; ESQUINA = "PENDIENTE"; ARISTAS = "PENDIENTE"
 HOLE_D = 4.8          # taladro nominal (4,75 en el dibujo de referencia)
@@ -51,7 +51,7 @@ def cajetin(c, pag, npag):
             ("PROCESO:", "Corte CNC"), ("HERRAMIENTA:", "Fresa Ø9 mm · taladro Ø4,8"), ("UNIDADES:", "mm"),
             ("ESCALA:", "2.5:1 impreso en A3"), ("FECHA:", datetime.date.today().strftime("%d/%m/%Y")), ("DISEÑADO PARA:", "Gravity Wave"),
             ("CANTIDAD:", CANTIDAD), ("CARA A / B / CANTO:", f"{ACABADO} / {ACABADO} / {ACABADO}"), ("ACABADO CANTO:", CANTO),
-            ("ACABADO ESQUINA:", ESQUINA), ("ACABADO ARISTAS:", ARISTAS), ("REVISIÓN:", "REV02"), ("PÁG.:", f"{pag}/{npag}")]
+            ("ACABADO ESQUINA:", ESQUINA), ("ACABADO ARISTAS:", ARISTAS), ("REVISIÓN:", "REV03"), ("PÁG.:", f"{pag}/{npag}")]
     BX, BY, BW, rh = 250, 10, 160, 5.0; BH = rh * len(rows)
     c.setLineWidth(0.6); c.rect(M(BX), M(BY), M(BW), M(BH)); c.setLineWidth(0.25)
     for i, (k, v) in enumerate(rows):
@@ -86,7 +86,7 @@ def iso(c, pts, hole, x, y, w, h, t):
     for i in range(n):
         a, b = pts[i], pts[(i+1) % n]
         nx, ny = (b[1]-a[1]), -(b[0]-a[0])
-        if nx * kx + ny * ky < 0: continue
+        if nx * kx + ny * ky > 0: continue   # polígono CCW: se ven las caras que miran hacia (-kx,-ky)
         quads.append([T(*a, 0), T(*b, 0), T(*b, t), T(*a, t)])
     for q in quads: poly(c, q, fill=(0.80, 0.84, 0.83), lw=0.3)
     poly(c, [T(*p, 0) for p in pts], fill=(0.93, 0.95, 0.94), lw=0.6)
@@ -104,7 +104,7 @@ def dxf(g, hole, fn):
 
 def plano(m, fn):
     g = m["g"]; hole = m["hole"]; W, Hh = m["ancho"], m["alto"]
-    c = canvas.Canvas(fn, pagesize=(PW, PH)); c.setTitle(f"{PRODUCTO} REV02 - Plano"); c.setAuthor("Gravity Wave")
+    c = canvas.Canvas(fn, pagesize=(PW, PH)); c.setTitle(f"{PRODUCTO} REV03 - Plano"); c.setAuthor("Gravity Wave")
     c.setLineWidth(0.7); c.rect(M(10), M(10), M(400), M(277))
     cajetin(c, 1, 1)
     S = 2.5; OX, OY = 32, 122
@@ -147,7 +147,7 @@ def plano(m, fn):
     # datos y notas
     y = texto(c, 252, 282, 156, "DATOS DE LA PIEZA", [
         f"Envolvente: {f(W)} x {f(Hh)} x {f(ESPESOR)} mm. Área de la cara: {m['area']:.1f} cm². Altura total de la ola = 40 mm (referencia).",
-        f"Contorno vectorizado del dibujo de referencia: geometría exacta en el DXF ({REF}_Pieza01_Llavero.dxf), capa CUT_OUTER (polilínea cerrada).",
+        f"Contorno vectorizado del dibujo de referencia y adaptado a fresa Ø9 (nota 3): geometría exacta en el DXF ({REF}_Pieza01_Llavero.dxf), capa CUT_OUTER (polilínea cerrada).",
         f"Taladro Ø{f(HOLE_D)} en ({f(hole[0])}, {f(hole[1])}) desde 0,0, capa DRILL (en el dibujo: Ø{f(m['hole_d'])}). Pared mínima al taladro {f(m['pared'])} mm.",
         f"Tubo: hueco circular Ø{f(td)} centrado en ({f(tx)}, {f(ty)}), abierto hacia la derecha por una boca de {f(m['boca'])} mm.",
         f"Lóbulo de la anilla: R{f(lr)} centrado en ({f(lx)}, {f(ly)}). Base recta de {f(m['base'][1] - m['base'][0])} mm.",
@@ -155,8 +155,8 @@ def plano(m, fn):
     y = texto(c, 252, y - 2, 156, "NOTAS DE FABRICACIÓN", [
         "1. Corte pasante de una sola pieza, sin rebajes. DXF con geometría nominal; compensación de fresa en CAM. Tolerancia general ±0,5 mm.",
         f"2. ESPESOR 5 mm. Catálogo Gravitec: {ACABADO} se sirve en 10 / 18 / 30 mm; el espesor de 5 mm existe en Niza, Ifach, Cadaqués, Marsella, Andros, Ítaca, Capri, Sicilia y Palermo. CONFIRMAR acabado/espesor antes de mecanizar.",
-        f"3. Fresa Ø9: el tubo (Ø{f(td)}) se vacía por dentro. La boca de {f(m['boca'])} mm es menor que la fresa: se corta desde los dos lados; solo quedan sin alcanzar dos puntos de < 1 mm² en las uniones labio-tubo y lóbulo-tubo, que salen con R4,5 (desviación < 0,2 mm respecto al dibujo).",
-        f"4. Taladro Ø{f(HOLE_D)} con broca (capa DRILL). Si se prefiere fresar, agujero mínimo Ø9: no aplica aquí.",
+        f"3. Geometría apta para fresa Ø9: todos los radios cóncavos del DXF son >= R4,5. Las dos uniones labio-tubo y lóbulo-tubo del dibujo original (radio pequeño) van ya con R4,5 (desviación máx. {f(m['info']['desv_cnc_mm'])} mm). La boca del tubo ({f(m['boca'])} mm) es menor que la fresa: la fresa la corta entrando por el tubo y por fuera.",
+        f"4. Orden de mecanizado: (1) taladro Ø{f(HOLE_D)} con broca (capa DRILL); (2) tubo Ø{f(td)} como VACIADO completo (pocket), no como perfil, para no dejar un disco suelto; (3) contorno exterior (CUT_OUTER) con puentes de sujeción (tabs) o vacío: la pieza es pequeña y se suelta al final del corte.",
         "5. Sin zonas de menos de 5 mm salvo la pared del taladro (ver datos). Pieza de una sola cara, sin zonas flotantes.",
         "6. Acabado de canto, esquina y aristas: PENDIENTE (ver cajetín). Cantidad PENDIENTE: nesting al confirmarla (separación mínima 9 mm; girar 0/90/180º, nunca voltear).",
         "7. Uso decorativo. Gravitec NO APTO PARA USO ALIMENTARIO."])
