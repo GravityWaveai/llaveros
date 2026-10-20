@@ -34,10 +34,15 @@ OK     PDF contiene '32.89'
 OK     PDF contiene 'ESCALA'
 OK     PDF contiene '2.5:1'
 OK     PDF contiene 'FRESA'
+OK     PDF contiene 'CADAQUÉS'
+OK     PDF contiene 'IFACH'
+OK     PDF contiene 'SICILIA'
+OK     PDF contiene 'CAPRI'
+OK     PDF contiene '2400 X 1200'
 OK     PDF contiene 'NO APTO PARA USO ALIMENTARIO'
 OK     PDF contiene 'CUT_OUTER'
 OK     PDF contiene 'DRILL'
 FALLO  PDF: datos PENDIENTES (no enviar a taller hasta completarlos)  -> cantidad, canto, esquina, aristas
 OK     Fidelidad: contorno DXF = dibujo de referencia salvo las dos uniones R4,5 (desv. máx < 1 mm, solo en la boca)  -> 0.875 mm
 OK     Fidelidad: la desviación queda confinada a la boca del tubo  -> 12 vértices desviados, en x 36.2-40.1, y 20.8-28.7
-TOTAL FALLOS: 1 de 42
+TOTAL FALLOS: 1 de 47

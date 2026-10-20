@@ -1,4 +1,4 @@
-"""Revisión independiente del paquete REV03: DXF, geometría, CNC Ø9 y plano."""
+"""Revisión independiente del paquete REV04: DXF, geometría, CNC Ø9 y plano."""
 import math, numpy as np, ezdxf
 from ezdxf import bbox
 from ezdxf.audit import Auditor
@@ -6,7 +6,7 @@ from shapely.geometry import Polygon, Point, LineString
 from shapely.validation import explain_validity
 import pdfplumber
 
-DXF = "../plano/Llavero_Ola_REV03_Pieza01_Llavero.dxf"; PDF = "../plano/Llavero_Ola_REV03_Plano.pdf"
+DXF = "../plano/Llavero_Ola_REV04_Pieza01_Llavero.dxf"; PDF = "../plano/Llavero_Ola_REV04_Plano.pdf"
 R = []
 def chk(n, ok, d=""): R.append((n, "OK" if ok else "FALLO", d)); return ok
 
@@ -72,13 +72,13 @@ face = cq.Face.makeFromWires(wire)
 solid = cq.Solid.extrudeLinear(face, cq.Vector(0, 0, 5)).cut(cq.Solid.makeCylinder(hd / 2, 7, cq.Vector(hc[0], hc[1], -1)))
 chk("3D: el contorno extruye a un sólido válido de 5 mm", solid.isValid() and abs(solid.BoundingBox().zlen - 5) < 1e-6, f"volumen {solid.Volume():.0f} mm³")
 chk("3D: volumen = área DXF x 5 - taladro", abs(solid.Volume() - (poly.area - math.pi * (hd/2)**2) * 5) < 1.0, f"{solid.Volume():.1f} vs {(poly.area - math.pi*(hd/2)**2)*5:.1f}")
-cq.exporters.export(cq.Workplane().add(solid), "../plano/Llavero_Ola_REV03.step")
+cq.exporters.export(cq.Workplane().add(solid), "../plano/Llavero_Ola_REV04.step")
 # --- plano PDF: cotas = DXF
 with pdfplumber.open(PDF) as d:
     pg = d.pages[0]; txt = pg.extract_text()
     chk("PDF: formato A3 apaisado", abs(pg.width / 72 * 25.4 - 420) < 1 and abs(pg.height / 72 * 25.4 - 297) < 1)
 ff = lambda x: f"{x:.2f}".rstrip("0").rstrip(".")
-for k in ["46.23", "40", ff(hc[0]), ff(hc[1]), "Ø4.8", "Ø" + ff(td), ff(tx), ff(ty), ff(MM["boca"]), ff(MM["base"][1] - MM["base"][0]), "ESCALA", "2.5:1", "FRESA", "NO APTO PARA USO ALIMENTARIO", "CUT_OUTER", "DRILL"]:
+for k in ["46.23", "40", ff(hc[0]), ff(hc[1]), "Ø4.8", "Ø" + ff(td), ff(tx), ff(ty), ff(MM["boca"]), ff(MM["base"][1] - MM["base"][0]), "ESCALA", "2.5:1", "FRESA", "CADAQUÉS", "IFACH", "SICILIA", "CAPRI", "2400 X 1200", "NO APTO PARA USO ALIMENTARIO", "CUT_OUTER", "DRILL"]:
     chk(f"PDF contiene '{k}'", k.upper() in txt.upper())
 chk("PDF: datos PENDIENTES (no enviar a taller hasta completarlos)", "PENDIENTE" not in txt, "cantidad, canto, esquina, aristas")
 # --- fidelidad al dibujo de referencia
@@ -92,4 +92,4 @@ chk("Fidelidad: la desviación queda confinada a la boca del tubo", all(33 < p[0
 print(f"{'ESTADO':6} COMPROBACIÓN")
 for n, e, d in R: print(f"{e:6} {n}" + (f"  -> {d}" if d else ""))
 print(f"\nTOTAL FALLOS: {sum(e=='FALLO' for _,e,_ in R)} de {len(R)} comprobaciones")
-open("../plano/Llavero_Ola_REV03_Verificacion.txt", "w").write("\n".join(f"{e:6} {n}" + (f"  -> {d}" if d else "") for n, e, d in R) + f"\nTOTAL FALLOS: {sum(e=='FALLO' for _,e,_ in R)} de {len(R)}\n")
+open("../plano/Llavero_Ola_REV04_Verificacion.txt", "w").write("\n".join(f"{e:6} {n}" + (f"  -> {d}" if d else "") for n, e, d in R) + f"\nTOTAL FALLOS: {sum(e=='FALLO' for _,e,_ in R)} de {len(R)}\n")

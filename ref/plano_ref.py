@@ -8,8 +8,8 @@ from reportlab.pdfbase.ttfonts import TTFont
 from shapely.geometry import Point
 from medidas import medir
 
-REF = "Llavero_Ola_REV03"; PRODUCTO = "Llavero ola"
-ACABADO = "Formentera"; ESPESOR = 5; CANTIDAD = "PENDIENTE"
+REF = "Llavero_Ola_REV04"; PRODUCTO = "Llavero ola"
+ACABADO = "Cadaqués o Ifach"; ESPESOR = 5; CANTIDAD = "PENDIENTE"
 CANTO = "PENDIENTE"; ESQUINA = "PENDIENTE"; ARISTAS = "PENDIENTE"
 HOLE_D = 4.8          # taladro nominal (4,75 en el dibujo de referencia)
 OUT = "../plano"
@@ -47,11 +47,11 @@ def poly(c, pts, fill=None, lw=0.6, dash=None):
 
 def cajetin(c, pag, npag):
     rows = [("PROYECTO:", f"{PRODUCTO}  ({REF})"), ("PIEZA / VISTA:", "01 Llavero (1 ud)"), ("EMPRESA:", "Gravity Wave"),
-            ("MATERIAL:", "Panel plástico reciclado Gravitec"), ("ACABADO:", ACABADO), ("ESPESOR:", f"{ESPESOR} mm (ver nota 2)"),
+            ("MATERIAL:", "Panel plástico reciclado Gravitec"), ("ACABADO:", ACABADO), ("ESPESOR:", f"{ESPESOR} mm"),
             ("PROCESO:", "Corte CNC"), ("HERRAMIENTA:", "Fresa Ø9 mm · taladro Ø4,8"), ("UNIDADES:", "mm"),
             ("ESCALA:", "2.5:1 impreso en A3"), ("FECHA:", datetime.date.today().strftime("%d/%m/%Y")), ("DISEÑADO PARA:", "Gravity Wave"),
-            ("CANTIDAD:", CANTIDAD), ("CARA A / B / CANTO:", f"{ACABADO} / {ACABADO} / {ACABADO}"), ("ACABADO CANTO:", CANTO),
-            ("ACABADO ESQUINA:", ESQUINA), ("ACABADO ARISTAS:", ARISTAS), ("REVISIÓN:", "REV03"), ("PÁG.:", f"{pag}/{npag}")]
+            ("CANTIDAD:", CANTIDAD), ("CARA A / B / CANTO:", "Cadaqués/Cadaqués/Sicilia · Ifach/Ifach/Capri"), ("ACABADO CANTO:", CANTO),
+            ("ACABADO ESQUINA:", ESQUINA), ("ACABADO ARISTAS:", ARISTAS), ("REVISIÓN:", "REV04"), ("PÁG.:", f"{pag}/{npag}")]
     BX, BY, BW, rh = 250, 10, 160, 5.0; BH = rh * len(rows)
     c.setLineWidth(0.6); c.rect(M(BX), M(BY), M(BW), M(BH)); c.setLineWidth(0.25)
     for i, (k, v) in enumerate(rows):
@@ -104,7 +104,7 @@ def dxf(g, hole, fn):
 
 def plano(m, fn):
     g = m["g"]; hole = m["hole"]; W, Hh = m["ancho"], m["alto"]
-    c = canvas.Canvas(fn, pagesize=(PW, PH)); c.setTitle(f"{PRODUCTO} REV03 - Plano"); c.setAuthor("Gravity Wave")
+    c = canvas.Canvas(fn, pagesize=(PW, PH)); c.setTitle(f"{PRODUCTO} REV04 - Plano"); c.setAuthor("Gravity Wave")
     c.setLineWidth(0.7); c.rect(M(10), M(10), M(400), M(277))
     cajetin(c, 1, 1)
     S = 2.5; OX, OY = 32, 122
@@ -154,7 +154,7 @@ def plano(m, fn):
         "Origen 0,0 = esquina inferior izquierda de la envolvente. Cara A = +Z en el DXF. Mecanizar siempre con la cara A arriba."])
     y = texto(c, 252, y - 2, 156, "NOTAS DE FABRICACIÓN", [
         "1. Corte pasante de una sola pieza, sin rebajes. DXF con geometría nominal; compensación de fresa en CAM. Tolerancia general ±0,5 mm.",
-        f"2. ESPESOR 5 mm. Catálogo Gravitec: {ACABADO} se sirve en 10 / 18 / 30 mm; el espesor de 5 mm existe en Niza, Ifach, Cadaqués, Marsella, Andros, Ítaca, Capri, Sicilia y Palermo. CONFIRMAR acabado/espesor antes de mecanizar.",
+        "2. ACABADO Gravitec Cadaqués o Ifach (elegir uno en el pedido; misma geometría). Panel 2400 x 1200 mm, espesor 5 mm (disponible en ambos). Caras A y B del acabado pedido; el canto/núcleo queda del color del pulido pareja: Sicilia si es Cadaqués, Capri si es Ifach.",
         f"3. Geometría apta para fresa Ø9: todos los radios cóncavos del DXF son >= R4,5. Las dos uniones labio-tubo y lóbulo-tubo del dibujo original (radio pequeño) van ya con R4,5 (desviación máx. {f(m['info']['desv_cnc_mm'])} mm). La boca del tubo ({f(m['boca'])} mm) es menor que la fresa: la fresa la corta entrando por el tubo y por fuera.",
         f"4. Orden de mecanizado: (1) taladro Ø{f(HOLE_D)} con broca (capa DRILL); (2) tubo Ø{f(td)} como VACIADO completo (pocket), no como perfil, para no dejar un disco suelto; (3) contorno exterior (CUT_OUTER) con puentes de sujeción (tabs) o vacío: la pieza es pequeña y se suelta al final del corte.",
         "5. Sin zonas de menos de 5 mm salvo la pared del taladro (ver datos). Pieza de una sola cara, sin zonas flotantes.",
